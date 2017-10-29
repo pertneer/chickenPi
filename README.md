@@ -13,9 +13,9 @@ Raspberry Pi controlled chicken coop door
 ### Important
 
 open command line and run following command
-   - sudo python /home/<Username>/Desktop/sunrise.py
+   - sudo python /home/\<Username\>/Desktop/sunrise.py
       - this will set initial time to open and close the door
    - sudo crontab -e
       - edit cron to add the following
-         - 0 4 * * * python /home/<Username>/Desktop/sunrise.py
+         - 0 4 * * * python /home/\<Username\>/Desktop/sunrise.py
       - this will run the sunrise program each morning at 4 a.m. to get the days sunrise and sunset times
