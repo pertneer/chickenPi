@@ -59,14 +59,14 @@ os.system(cmd)
 
 time.sleep(5)
 
-cmd = '(sudo crontab -l; echo " ' + str(sunriseMinute) + " " + str(sunriseHour) + ' * * * python ' + config.get('FileLocations','chickenPy') + '") | sort - | uniq - | sudo crontab -'
+cmd = '(sudo crontab -l; echo " ' + str(sunriseMinute) + " " + str(sunriseHour) + ' * * * python /home/pertneer/Desktop/chicken.py") | sort - | uniq - | sudo crontab -'
 os.system(cmd)
 
 with open(config.get('FileLocations','logsunrise'),'a') as f:
 	f.write(datetime.datetime.now().strftime(dateString) + "\n" + cmd + "\n")
 	f.close()
 
-cmd = '(sudo crontab -l; echo " ' + str(sunsetMinute) + " " + str(sunsetHour) + ' * * * python ' + config.get('FileLocations','chickenPy') + '") | sort - | uniq - | sudo crontab -'
+cmd = '(sudo crontab -l; echo " ' + str(sunsetMinute) + " " + str(sunsetHour) + ' * * * python /home/pertneer/Desktop/chicken.py") | sort - | uniq - | sudo crontab -'
 os.system(cmd)
 
 with open(config.get('FileLocations','logsunset') ,'a') as f:
@@ -81,5 +81,5 @@ with open(config.get('FileLocations','sunriseConf') ,'r+') as f:
 	f.close()
 
 with open(config.get('FileLocations','log') ,'a') as f:
-	f.write(datetime.datetime.now().strftime(dateString) + "\n")
+	f.write(datetime.datetime.now().strftime(dateString) + " sunrise.py\n")
 	f.close()
