@@ -1,14 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
 import RPi.GPIO as GPIO
-import time
+import time,datetime
 import ConfigParser
 from smtplib import SMTP
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
-debug=True
+debug=False
 message = "Debug"
 body= "Debug Body"
+dateString = '%Y/%m/%d %H:%M:%S'
 
 config=ConfigParser.ConfigParser()
 config.read('/home/pertneer/Desktop/config.ini')
@@ -21,8 +23,8 @@ toAddr=config.get('Email','toAddr')
 fromPasswrd=config.get('Email','fromPasswrd')
 servAddr=config.get('Email','servAddr')
 
-if (GPIO.getmode() == 11) or (GPIO.getmode() == None):
-	GPIO.setmode(GPIO.BOARD)
+if (GPIO.getmode() == 10) or (GPIO.getmode() == None):
+	GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(powerPin, GPIO.OUT)
 GPIO.output(powerPin, False)
@@ -32,20 +34,33 @@ GPIO.setup(doorClosePin, GPIO.IN, GPIO.PUD_UP)
 
 def sendEmail(subject="Test",body="Message Body"):
     if (debug == False):
-        server = SMTP()
+        server = SMTP(servAddr,587)
         server.set_debuglevel(True)
-        server.connect(servAddr,26)
+        server.starttls()
         server.login(fromAddr,fromPasswrd)
 
-        msg=MIMEMultipart()
-        msg['From']=fromAddr
-        msg['To']=toAddr
-        msg['Subject']=subject
-        msg.attach(MIMEText(body,'plain'))
-        text=msg.as_string()
-        server.sendmail(fromAddr,toAddr,text)
+        server.sendmail(fromAddr, toAddr, subject)
+        time.sleep(.1)
+        server.sendmail(fromAddr, toAddr, body)
         server.quit()
         return True
+
+        #server = SMTP()
+        #server.set_debuglevel(True)
+        #server.connect(servAddr,26)
+        #server.login(fromAddr,fromPasswrd)
+
+        #msg=MIMEMultipart()
+        #msg['From']=fromAddr
+        #msg['To']=toAddr
+        #msg['Subject']=subject
+        #timeStamp = "{0} {1}\n".format(time.strftime( "%I:%M:%S %p" ,time.localtime(time.time())), body)
+
+        #msg.attach(MIMEText(timeStamp,'plain'))
+        #text=msg.as_string()
+        #server.sendmail(fromAddr,toAddr,text)
+        #server.quit()
+        #return True
     else:
         print "Message: " + body
         print "Subject: " + subject
@@ -112,6 +127,10 @@ else:
     body = 'Door is not open or shut when initiating sequence'
     print "Error"
 
+
+with open(config.get('FileLocations','log') ,'a') as f:
+	f.write(datetime.datetime.now().strftime(dateString) + " chicken.py\n")
+	f.close()
 
 sendEmail(message,body)
 GPIO.cleanup()
