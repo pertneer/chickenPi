@@ -7,7 +7,7 @@ import os
 import ConfigParser
 
 config=ConfigParser.ConfigParser()
-config.read('/home/pertneer/Desktop/sunrise.ini')
+config.read('/home/pertneer/Desktop/config.ini')
 
 localtime = time.localtime()
 if(localtime.tm_isdst == 1):
@@ -75,9 +75,9 @@ with open(config.get('FileLocations','logsunset') ,'a') as f:
 
 with open(config.get('FileLocations','sunriseConf') ,'r+') as f:
 	f.seek(0)
-	f.write(str(sunriseHour) + ":" + str(sunriseMinute))
+	f.write(str(sunriseHour) + ":" + str('{:0>2}'.format(sunriseMinute)))
 	f.write('\n')
-	f.write(str(sunsetHour) + ":" + str(sunsetMinute))
+	f.write(str(sunsetHour) + ":" + str('{:0>2}'.format(sunsetMinute)))
 	f.close()
 
 with open(config.get('FileLocations','log') ,'a') as f:
