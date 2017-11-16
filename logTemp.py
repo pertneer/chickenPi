@@ -41,8 +41,6 @@ def setup():
     sunRise = sunTimes[0].strip('\n').replace(':',".")
     sunSet = sunTimes[1].strip('\n').replace(':',".")
     
-
-
 def writelog(message,location):
     with open("/home/pertneer/Desktop/%s" % location,'a') as f:
         f.write("{0} {1}\n".format(time.asctime( time.localtime(time.time())), message))
@@ -75,7 +73,7 @@ def loop():
         logData = str(temperature) + "," + str(humidity) + "," + str(temperatureOut) + "," + str(humidityOut)
         writelog(logData,'Logs/tempData.csv')
         time.sleep(sleepTime)
-
+        
 def destroy():
     writelog('Destroy', 'log.csv')
     GPIO.cleanup() # Release resource
