@@ -11,6 +11,8 @@ debug=False
 message = "Debug"
 body= "Debug Body"
 dateString = '%Y/%m/%d %H:%M:%S'
+currentDateString = '%H:%M'
+currentTime = time.strftime(currentDateString)
 
 config=ConfigParser.ConfigParser()
 config.read('/home/pertneer/Desktop/config.ini')
@@ -70,57 +72,68 @@ operating = True
 
 if (GPIO.input(doorOpenPin) == 0):
     #Door is Open
-    GPIO.output(powerPin,True)
-    print "door is closing"
-    #print GPIO.input(doorClosePin)
-    while operating:
-            if (GPIO.input(doorClosePin) == 0):
-                #door shut successfully
-                message = 'Door Shut was successful'
-                if(debug):
-                        print message
-                body="Chickens are all locked in for the night!"
-                operating = False
-            elif(count > 5):
-                #door did not shut
-                message = 'Door Shut operation Failed'
-                if(debug):
-                        print message
-                body="You need to check the door!"
-                operating = False
-            else:
-                time.sleep(10)
-                print str(count) + " closing operation"
-                count = count + 1
-    GPIO.output(powerPin,False)
-    print "Power is off to motor"
+        if(currentTime > 12):
+            GPIO.output(powerPin,True)
+            print "door is closing"
+            #print GPIO.input(doorClosePin)
+            while operating:
+                    if (GPIO.input(doorClosePin) == 0):
+                        #door shut successfully
+                        message = 'Door Shut was successful'
+                        if(debug):
+                                print message
+                        body="Chickens are all locked in for the night!"
+                        operating = False
+                    elif(count > 5):
+                        #door did not shut
+                        message = 'Door Shut operation Failed'
+                        if(debug):
+                                print message
+                        body="You need to check the door!"
+                        operating = False
+                    else:
+                        time.sleep(10)
+                        print str(count) + " closing operation"
+                        count = count + 1
+            GPIO.output(powerPin,False)
+            print "Power is off to motor"
+        else:
+           print "Door is already open"
+           message = "Door is already open"
+           body = "Door Was triggered before 12 when door was already open"
 elif (GPIO.input(doorClosePin) == 0):
     #Door Closed
-    GPIO.output(powerPin,True)
-    print "door is opening"
     
-    #print GPIO.input(doorClosePin)
-    while operating:
-            if (GPIO.input(doorOpenPin) == 0):
-                #door shut successfully
-                message = 'Door Open was successful'
-                if(debug):
-                        print message
-                body="Chickens are out to roam!"
-                operating = False
-            elif(count > 5):
-                #door did not shut
-                message = 'Door Open operation Failed'
-                if(debug):
-                        print message
-                body="You need to check the door!"
-                operating = False
-            else:
-                time.sleep(10)
-                print str(count) + " opening operation"
-                count = count + 1
-    GPIO.output(powerPin,False)
-    print "Power is off to motor"
+        
+        if(currentTime > 12):
+            print "Door Is already closed"
+            message = "Door was alread shut"
+            body = "Door was trigger after 12 when door was already shut"
+        else:
+            GPIO.output(powerPin,True)
+            print "door is opening"
+            #print GPIO.input(doorClosePin)
+            while operating:
+                    if (GPIO.input(doorOpenPin) == 0):
+                        #door shut successfully
+                        message = 'Door Open was successful'
+                        if(debug):
+                                print message
+                        body="Chickens are out to roam!"
+                        operating = False
+                    elif(count > 5):
+                        #door did not shut
+                        message = 'Door Open operation Failed'
+                        if(debug):
+                                print message
+                        body="You need to check the door!"
+                        operating = False
+                    else:
+                        time.sleep(10)
+                        print str(count) + " opening operation"
+                        count = count + 1
+            GPIO.output(powerPin,False)
+            print "Power is off to motor"
 else:
     #error
     message = "Door Error"
