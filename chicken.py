@@ -11,7 +11,7 @@ debug=False
 message = "Debug"
 body= "Debug Body"
 dateString = '%Y/%m/%d %H:%M:%S'
-currentDateString = '%H:%M'
+currentDateString = '%H'
 currentTime = time.strftime(currentDateString)
 
 config=ConfigParser.ConfigParser()
@@ -72,7 +72,7 @@ operating = True
 
 if (GPIO.input(doorOpenPin) == 0):
     #Door is Open
-        if(currentTime > 12):
+        if(int(currentTime) > 12):
             GPIO.output(powerPin,True)
             print "door is closing"
             #print GPIO.input(doorClosePin)
@@ -105,7 +105,8 @@ elif (GPIO.input(doorClosePin) == 0):
     #Door Closed
     
         
-        if(currentTime > 12):
+        if(int(currentTime) > 12):
+            print currentTime
             print "Door Is already closed"
             message = "Door was alread shut"
             body = "Door was trigger after 12 when door was already shut"
