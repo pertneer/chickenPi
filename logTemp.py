@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import time
-time.sleep(60)
+import MySQLdb
+time.sleep(10)
 import urllib2
 import datetime
 import Adafruit_DHT
@@ -8,6 +9,19 @@ import RPi.GPIO as GPIO
 import ConfigParser
 config=ConfigParser.ConfigParser()
 config.read('/home/pertneer/Desktop/config.ini')
+
+dbHost = config.get('database','host')
+dbUser = config.get('database','user')
+dbPasswd = config.get('database','passwd')
+dbDb = config.get('database','db')
+
+db = MySQLdb.connect(host=dbHost,
+                     user=dbUser,
+                     passwd=dbPasswd,
+                     db=dbDb)
+
+cur = db.cursor()
+
 
 outsidePin = int(config.get('DHT','outsidePin'))
 insidePin = int(config.get('DHT','insidePin'))
@@ -53,13 +67,19 @@ def loop():
     global pin
     
     log=True
-    i = 0
     while log:
-        
+        db = MySQLdb.connect(host=dbHost,
+                     user=dbUser,
+                     passwd=dbPasswd,
+                     db=dbDb)
+
+        cur = db.cursor()
         if(GPIO.input(doorOpenPin) == 0):
             doorLoc = 1
+            doorPosition='Open'
         elif(GPIO.input(doorClosePin) == 0):
             doorLoc = 0
+            doorPosition='Close'
         else:
             doorLoc = .5
         humidity, temperature = Adafruit_DHT.read_retry(sensor, insidePin)
@@ -70,13 +90,22 @@ def loop():
         temperatureOut = temperatureOut * 9/5 + 32
         temperatureOut = "{:2.2f}".format(temperatureOut)
         humidityOut = "{:2.2f}".format(humidityOut)
-        logData = str(temperature) + "," + str(humidity) + "," + str(temperatureOut) + "," + str(humidityOut)
-        writelog(logData,'Logs/tempData.csv')
-        time.sleep(sleepTime)
+        currentTime = time.strftime(dateString)
+        sqlQuery="INSERT INTO temperature(tempIn,tempOut,humidityIn,humidityOut,doorPosition,openTime,closeTime) VALUES (" + str(temperature) + ", " + str(temperatureOut) + ", " + str(humidity) + ", " + str(humidityOut) + ", '" + doorPosition + "', '" + sunRise + "', '" + sunSet + "')"
+        if(temperatureOut < 120 and humidityOut < 100):
+            cur.execute(sqlQuery)
+            db.commit()
+            db.close()
+        else:
+            logData = str(temperature) + "," + str(humidity) + "," + str(temperatureOut) + "," + str(humidityOut)
+            writelog(logData,'Logs/tempData.csv')
+        #time.sleep(sleepTime)
+        log = False
         
 def destroy():
     writelog('Destroy', 'log.csv')
     GPIO.cleanup() # Release resource
+    db.close()
 
 if __name__ == '__main__': # Program start from here
     setup()
