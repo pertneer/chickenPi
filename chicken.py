@@ -36,33 +36,21 @@ GPIO.setup(doorClosePin, GPIO.IN, GPIO.PUD_UP)
 
 def sendEmail(subject="Test",body="Message Body"):
     if (debug == False):
-        server = SMTP(servAddr,587)
-        server.set_debuglevel(True)
-        server.starttls()
-        server.login(fromAddr,fromPasswrd)
+        addresses = toAddr.split(",")
 
-        server.sendmail(fromAddr, toAddr, subject)
-        time.sleep(.1)
-        server.sendmail(fromAddr, toAddr, body)
-        server.quit()
+        for address in addresses:
+                server = SMTP(servAddr,587)
+                server.set_debuglevel(True)
+                server.starttls()
+                server.login(fromAddr,fromPasswrd)
+
+                server.sendmail(fromAddr, address, subject)
+                time.sleep(.1)
+                server.sendmail(fromAddr, address, body)
+                server.quit()
+
         return True
 
-        #server = SMTP()
-        #server.set_debuglevel(True)
-        #server.connect(servAddr,26)
-        #server.login(fromAddr,fromPasswrd)
-
-        #msg=MIMEMultipart()
-        #msg['From']=fromAddr
-        #msg['To']=toAddr
-        #msg['Subject']=subject
-        #timeStamp = "{0} {1}\n".format(time.strftime( "%I:%M:%S %p" ,time.localtime(time.time())), body)
-
-        #msg.attach(MIMEText(timeStamp,'plain'))
-        #text=msg.as_string()
-        #server.sendmail(fromAddr,toAddr,text)
-        #server.quit()
-        #return True
     else:
         print "Message: " + body
         print "Subject: " + subject
