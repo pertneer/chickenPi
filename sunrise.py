@@ -49,7 +49,7 @@ sunriseHour = int(sunriseHour)-timeoffset
 
 sunsetMinute = int(sunsetMinute)+int(config.get('Offsets','Sunset'))
 
-if int(sunsetMinute) > 60:
+if int(sunsetMinute) > 59:
 	sunsetHour = int(sunsetHour) + 1
 	sunsetMinute = int(sunsetMinute) - 60
 
